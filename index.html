@@ -232,6 +232,10 @@
   .spot-dir { font-size: 12px; color: var(--text-2); margin: 4px 0; line-height: 1.5; }
   .spot-dir strong { color: var(--text); font-weight: 600; }
   .spot-mini { font-size: 11px; color: var(--text-3); margin-top: 6px; line-height: 1.4; }
+  .spot-map-link { background: var(--surface-2); color: var(--accent); border: 1px solid var(--border); padding: 8px 12px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; margin-top: 10px; width: 100%; text-align: center; font-family: inherit; }
+  .spot-map-link:active { background: var(--accent-fade); }
+  .plan-map-btn { background: var(--accent); color: #0a0a0a; border: none; padding: 10px 14px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; margin: 12px 0; width: 100%; text-align: center; font-family: inherit; }
+  .plan-map-btn:active { opacity: 0.8; }
 
   .card { background: var(--surface); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 12px; }
   .card-title { font-family: var(--font-display); font-size: 16px; font-weight: 400; margin-bottom: 10px; }
@@ -363,6 +367,7 @@
     <div class="spot-meta">All finishes &middot; post-race festival</div>
     <div class="spot-dir"><strong>Watch:</strong> Ferril Lake, between lake and Museum of Nature and Science meadow.</div>
     <div class="spot-mini">MacKenna ~9:13 &middot; Vinnie ~9:59 &middot; Korbin ~10:17 &middot; Dustin ~12:07.</div>
+    <button class="spot-map-link" data-spot="City Park Finish">Show on map &rarr;</button>
   </div>
 
   <div class="spot">
@@ -370,42 +375,57 @@
     <div class="spot-meta">Marathon miles 6 + 20 &middot; Relay exchanges 1 &amp; 4</div>
     <div class="spot-dir"><strong>Drive:</strong> I-25 N to exit 210C, or I-25 S to exit 211. Mile High Stadium Circle. Park north-side lots.</div>
     <div class="spot-dir"><strong>Watch:</strong> West side of stadium, Gate 4.</div>
+    <button class="spot-map-link" data-spot="Empower Field">Show on map &rarr;</button>
   </div>
 
   <div class="spot">
     <div class="spot-head"><div class="spot-title">Sloan&apos;s Lake &middot; 17th &amp; Vrain</div><div class="spot-window">6:45&ndash;8:30 AM</div></div>
     <div class="spot-meta">Marathon miles 8&ndash;10 &middot; Relay exchange 2 (Kenna&apos;s finish)</div>
     <div class="spot-dir"><strong>Drive:</strong> from the north, down Sheridan.</div>
+    <button class="spot-map-link" data-spot="Sloan's Lake">Show on map &rarr;</button>
   </div>
 
   <div class="spot">
     <div class="spot-head"><div class="spot-title">Dudley &amp; Colfax</div><div class="spot-window">7:30&ndash;10:00 AM</div></div>
     <div class="spot-meta">Marathon mile 16 &middot; Relay exchange 3</div>
     <div class="spot-dir"><strong>Drive:</strong> 14th/Dover business lots south of Colfax.</div>
+    <button class="spot-map-link" data-spot="Dudley &amp; Colfax">Show on map &rarr;</button>
   </div>
 
   <div class="spot">
     <div class="spot-head"><div class="spot-title">Capitol &middot; Colfax &amp; Lincoln</div><div class="spot-window">6:30&ndash;8:20 AM</div></div>
     <div class="spot-meta">Marathon mile 2.5 &middot; Half mile 8 (MacKenna)</div>
     <div class="spot-dir"><strong>Watch:</strong> all 3 marathoners pass early (6:30&ndash;7:00). MacKenna ~8:14.</div>
+    <button class="spot-map-link" data-spot="State Capitol">Show on map &rarr;</button>
   </div>
 
   <div class="spot">
     <div class="spot-head"><div class="spot-title">Firestation #1 &middot; 745 W Colfax</div><div class="spot-window">6:35&ndash;8:25 AM</div></div>
     <div class="spot-meta">Marathon mile 3.5 &middot; Half mile 8</div>
     <div class="spot-dir"><strong>Watch:</strong> only race in the world that runs through a working fire station.</div>
+    <button class="spot-map-link" data-spot="Firestation #1">Show on map &rarr;</button>
   </div>
 
   <div class="spot">
     <div class="spot-head"><div class="spot-title">Confluence Park</div><div class="spot-window">7:00&ndash;11:15 AM</div></div>
     <div class="spot-meta">Marathon mile ~22</div>
     <div class="spot-dir"><strong>Walk:</strong> 0.5 mi east from Empower Field along the Cherry Creek Trail.</div>
+    <button class="spot-map-link" data-spot="Confluence Park">Show on map &rarr;</button>
+  </div>
+
+  <div class="spot">
+    <div class="spot-head"><div class="spot-title">16th Street Mall</div><div class="spot-window">8:20 AM &ndash; 11:30 AM</div></div>
+    <div class="spot-meta">Marathon mile ~23 &middot; Half mile 9</div>
+    <div class="spot-dir"><strong>Watch:</strong> indoor restrooms, cafes, free 16th St shuttle. Good late-race shelter spot for the marathon.</div>
+    <div class="spot-mini">MacKenna ~8:25 &middot; Vinnie ~9:33 &middot; Korbin ~9:50 &middot; Dustin ~11:24.</div>
+    <button class="spot-map-link" data-spot="16th St Mall">Show on map &rarr;</button>
   </div>
 
   <div class="spot">
     <div class="spot-head"><div class="spot-title">17th Avenue &middot; Restaurant Row</div><div class="spot-window">7:15 AM &ndash; 12:00 PM</div></div>
     <div class="spot-meta">Marathon mile 24&ndash;25 &middot; Half mile 11&ndash;12</div>
     <div class="spot-dir"><strong>Watch:</strong> stay NORTH of 17th. Last visible mile before runners enter City Park.</div>
+    <button class="spot-map-link" data-spot="17th Ave">Show on map &rarr;</button>
   </div>
 </div>
 
@@ -489,6 +509,67 @@ document.querySelectorAll('.tab').forEach(t => {
       setTimeout(() => window.colfaxMap.invalidateSize(), 100);
     }
   });
+});
+
+// Map navigation helpers — switch to Map tab and focus
+function switchToMapTab() {
+  document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelector('.tab[data-tab="map"]').classList.add('active');
+  document.querySelector('[data-panel="map"]').classList.add('active');
+  if (window.colfaxMap) {
+    setTimeout(() => window.colfaxMap.invalidateSize(), 100);
+  }
+}
+function showSpotOnMap(spotName) {
+  switchToMapTab();
+  setTimeout(() => {
+    const marker = spotMarkers[spotName];
+    if (marker && window.colfaxMap) {
+      window.colfaxMap.setView(marker.getLatLng(), 15, { animate: true });
+      marker.openPopup();
+    }
+  }, 250);
+}
+// Mapping: which spots each plan visits (in viewing order)
+const PLAN_SPOTS = {
+  'A': ['Empower Field', 'City Park Finish'],
+  'B': ['Empower Field', 'City Park Finish'],
+  'C': ['Empower Field', "Sloan's Lake", 'City Park Finish'],
+  'D': ['State Capitol', 'Firestation #1', 'City Park Finish'],
+  'E': ['Empower Field', 'Confluence Park', 'City Park Finish'],
+  'F': ["Sloan's Lake", 'City Park Finish'],
+  'G': ['17th Ave', 'City Park Finish'],
+  'H': ['State Capitol', 'Firestation #1', '16th St Mall', 'City Park Finish']
+};
+function showPlanOnMap(planKey) {
+  switchToMapTab();
+  setTimeout(() => {
+    const spots = PLAN_SPOTS[planKey];
+    if (!spots || !window.colfaxMap) return;
+    const points = [];
+    spots.forEach(name => {
+      const m = spotMarkers[name];
+      if (m) points.push(m.getLatLng());
+    });
+    if (points.length > 0) {
+      const bounds = L.latLngBounds(points);
+      window.colfaxMap.fitBounds(bounds, { padding: [50, 50], maxZoom: 14 });
+    }
+  }, 250);
+}
+// Delegated click listener — handles both spot links (any tab) and plan buttons
+document.addEventListener('click', (e) => {
+  const spotBtn = e.target.closest('[data-spot]');
+  if (spotBtn) {
+    showSpotOnMap(spotBtn.dataset.spot);
+    return;
+  }
+  const planBtn = e.target.closest('[data-plan-map]');
+  if (planBtn) {
+    showPlanOnMap(planBtn.dataset.planMap);
+    return;
+  }
 });
 
 // Time simulation
@@ -620,8 +701,9 @@ const halfLayer = L.polyline(HALF_ROUTE.map(p => [p[0], p[1]]), {
 const combinedBounds = L.latLngBounds(MARATHON_ROUTE.map(p => [p[0], p[1]]));
 map.fitBounds(combinedBounds, { padding: [20, 20] });
 
-// Spot markers
+// Spot markers — saved by name so other tabs can target them
 const spotLayer = L.layerGroup().addTo(map);
+const spotMarkers = {};
 SPOTS.forEach(s => {
   const icon = L.divIcon({
     className: 'spot-icon',
@@ -634,6 +716,7 @@ SPOTS.forEach(s => {
     '<div class="pop-title">' + s.name + '</div>' +
     '<div class="pop-detail">' + s.desc + '</div>'
   );
+  spotMarkers[s.name] = marker;
 });
 
 // Runner markers (will be populated by updateRunnerMarkers)
@@ -785,6 +868,11 @@ function renderPlan(key) {
   let chipsHtml = '';
   plan.vibe.forEach(v => { chipsHtml += '<span class="plan-chip">' + v + '</span>'; });
   let html = '<div class="plan-header"><div class="plan-header-title">' + plan.title + '<span class="plan-header-finish">Finish</span></div><div class="plan-header-sum">' + plan.summary + '</div><div class="plan-chips">' + chipsHtml + '</div></div>';
+
+  // View all stops on map button
+  if (PLAN_SPOTS[key]) {
+    html += '<button class="plan-map-btn" data-plan-map="' + key + '">View all stops on map &rarr;</button>';
+  }
 
   // Sightings list — who you will see on this plan
   if (plan.sightings && plan.sightings.length) {
