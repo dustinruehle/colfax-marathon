@@ -69,6 +69,16 @@
   .filter-chip.marathon.active { background: var(--marathon); border-color: var(--marathon); color: white; }
   .filter-chip.half.active { background: var(--half); border-color: var(--half); color: white; }
   .filter-chip.runners.active { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+  /* Plan context bar — appears above the map when a plan is active */
+  .plan-context-bar { display: flex; align-items: stretch; background: var(--accent); color: #0a0a0a; border-radius: 8px; margin-bottom: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(240, 180, 24, 0.25); }
+  .plan-context-back { flex: 1; display: flex; align-items: center; gap: 8px; background: transparent; border: none; color: #0a0a0a; padding: 10px 14px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; text-align: left; }
+  .plan-context-arrow { font-size: 16px; font-weight: 700; }
+  .plan-context-back:active { opacity: 0.7; }
+  .plan-context-close { background: transparent; border: none; border-left: 1px solid rgba(10, 10, 10, 0.2); color: #0a0a0a; padding: 0 14px; font-size: 20px; font-weight: 700; cursor: pointer; font-family: inherit; }
+  .plan-context-close:active { opacity: 0.6; }
+  /* When plan is active, dim non-plan spot markers AND runner markers */
+  .map-plan-active .spot-icon:not(.spot-in-plan) { opacity: 0.25; filter: grayscale(0.6); }
+  .map-plan-active .runner-icon { opacity: 0.4; }
   .map-legend-card { background: var(--surface); border-radius: var(--radius); padding: 10px 12px; margin: 8px 0; font-size: 11px; }
   .static-maps-reference { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
   .static-maps-reference img { width: 100%; border-radius: 6px; display: block; cursor: zoom-in; }
@@ -281,6 +291,13 @@
 </div>
 
 <div class="panel active" data-panel="map">
+  <div id="planContextBar" class="plan-context-bar" style="display: none;">
+    <button class="plan-context-back" id="planContextBack">
+      <span class="plan-context-arrow">&larr;</span>
+      <span class="plan-context-label">Back to <span id="planContextLabel">Plan</span></span>
+    </button>
+    <button class="plan-context-close" id="planContextClose" aria-label="Clear plan filter">&times;</button>
+  </div>
   <div class="map-filter-bar">
     <button class="filter-chip marathon active" data-filter="marathon">Marathon route</button>
     <button class="filter-chip half active" data-filter="half">Half route</button>
@@ -501,6 +518,10 @@ Object.keys(RACERS).forEach(key => {
 // Tab switching
 document.querySelectorAll('.tab').forEach(t => {
   t.addEventListener('click', () => {
+    // Manual tab switch clears any active plan context (except staying on map)
+    if (t.dataset.tab !== 'map' && typeof clearPlanContext === 'function') {
+      clearPlanContext();
+    }
     document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
     document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
     t.classList.add('active');
@@ -522,6 +543,8 @@ function switchToMapTab() {
   }
 }
 function showSpotOnMap(spotName) {
+  // Different context now — clear any active plan
+  clearPlanContext();
   switchToMapTab();
   setTimeout(() => {
     const marker = spotMarkers[spotName];
@@ -542,11 +565,50 @@ const PLAN_SPOTS = {
   'G': ['17th Ave', 'City Park Finish'],
   'H': ['State Capitol', 'Firestation #1', '16th St Mall', 'City Park Finish']
 };
+let activePlanKey = null;
+function applyPlanContext(planKey) {
+  activePlanKey = planKey;
+  const plan = PLANS[planKey];
+  const planSpots = PLAN_SPOTS[planKey] || [];
+  // Show the context bar
+  const bar = document.getElementById('planContextBar');
+  const label = document.getElementById('planContextLabel');
+  if (bar && label && plan) {
+    label.textContent = 'Plan ' + plan.letter + ' \u00b7 ' + plan.short;
+    bar.style.display = 'flex';
+  }
+  // Add map-plan-active class to map container, tag plan spots
+  const mapEl = document.getElementById('map');
+  if (mapEl) mapEl.classList.add('map-plan-active');
+  // Tag each plan spot marker with spot-in-plan class
+  Object.keys(spotMarkers).forEach(name => {
+    const m = spotMarkers[name];
+    if (m && m._icon) {
+      if (planSpots.indexOf(name) !== -1) {
+        m._icon.classList.add('spot-in-plan');
+      } else {
+        m._icon.classList.remove('spot-in-plan');
+      }
+    }
+  });
+}
+function clearPlanContext() {
+  activePlanKey = null;
+  const bar = document.getElementById('planContextBar');
+  if (bar) bar.style.display = 'none';
+  const mapEl = document.getElementById('map');
+  if (mapEl) mapEl.classList.remove('map-plan-active');
+  Object.keys(spotMarkers).forEach(name => {
+    const m = spotMarkers[name];
+    if (m && m._icon) m._icon.classList.remove('spot-in-plan');
+  });
+}
 function showPlanOnMap(planKey) {
   switchToMapTab();
   setTimeout(() => {
     const spots = PLAN_SPOTS[planKey];
     if (!spots || !window.colfaxMap) return;
+    applyPlanContext(planKey);
     const points = [];
     spots.forEach(name => {
       const m = spotMarkers[name];
@@ -558,6 +620,25 @@ function showPlanOnMap(planKey) {
     }
   }, 250);
 }
+// Wire context bar buttons
+document.getElementById('planContextBack').addEventListener('click', () => {
+  const key = activePlanKey;
+  clearPlanContext();
+  if (!key) return;
+  // Switch to Plans tab and render that plan
+  document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelector('.tab[data-tab="plans"]').classList.add('active');
+  document.querySelector('[data-panel="plans"]').classList.add('active');
+  // Activate the right plan button in the grid and render
+  document.querySelectorAll('.plan-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.plan === key);
+  });
+  if (typeof renderPlan === 'function') renderPlan(key);
+});
+document.getElementById('planContextClose').addEventListener('click', () => {
+  clearPlanContext();
+});
 // Delegated click listener — handles both spot links (any tab) and plan buttons
 document.addEventListener('click', (e) => {
   const spotBtn = e.target.closest('[data-spot]');
