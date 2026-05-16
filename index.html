@@ -182,6 +182,7 @@
   .runner-body { flex: 1; min-width: 0; }
   .runner-name { font-weight: 600; font-size: 15px; line-height: 1.2; }
   .runner-meta { font-size: 12px; color: var(--text-2); line-height: 1.35; margin-top: 2px; }
+  .runner-finish { font-size: 12px; color: var(--accent); line-height: 1.35; margin-top: 4px; font-family: var(--font-mono); }
 
   .h-section { font-family: var(--font-display); font-size: 18px; font-weight: 400; margin: 24px 0 10px; letter-spacing: -0.01em; }
   .h-section-sub { font-size: 11px; color: var(--text-3); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 14px; font-weight: 600; }
@@ -301,6 +302,7 @@
     <div class="runner-body">
       <div class="runner-name">Dustin · marathon</div>
       <div class="runner-meta">Bib 14213 · corral P · 13:15 pace · sub-6 goal</div>
+      <div class="runner-finish" id="finish-dustin">Est. finish: —</div>
     </div>
   </div>
   <div class="runner">
@@ -308,6 +310,7 @@
     <div class="runner-body">
       <div class="runner-name">Korbin · marathon</div>
       <div class="runner-meta">Bib 13962 · corral O · 4:00 target · 3:30 stretch</div>
+      <div class="runner-finish" id="finish-korbin">Est. finish: —</div>
     </div>
   </div>
   <div class="runner">
@@ -315,6 +318,7 @@
     <div class="runner-body">
       <div class="runner-name">Vinnie · marathon</div>
       <div class="runner-meta">Bib 13020 · corral J · 8:50 base · Achilles caution</div>
+      <div class="runner-finish" id="finish-vinnie">Est. finish: —</div>
     </div>
   </div>
   <div class="runner">
@@ -322,6 +326,7 @@
     <div class="runner-body">
       <div class="runner-name">MacKenna · half marathon</div>
       <div class="runner-meta">Bib 7011 · corral V · 11:30 pace · 2:30 goal · loops City Park 1-6</div>
+      <div class="runner-finish" id="finish-mackenna">Est. finish: —</div>
     </div>
   </div>
   <div class="runner">
@@ -329,6 +334,7 @@
     <div class="runner-body">
       <div class="runner-name">Kenna · relay leg 2</div>
       <div class="runner-meta">Bib 92589258 · 3.8 mi · 9:30 pace · stadium &rarr; Sloan&apos;s</div>
+      <div class="runner-finish" id="finish-kenna">Est. finish: —</div>
     </div>
   </div>
 
@@ -456,12 +462,21 @@ const SPOTS = [{"name":"City Park Finish","lat":39.7472,"lng":-104.9505,"icon":"
 const PLANS = {"A":{"letter":"A","short":"Stadium Anchor","tag":"Empower Field all-day","title":"Plan A \u2014 Stadium Anchor","summary":"One parking spot. Every marathoner sighted twice, plus Kenna's handoff and the leg 4\u20135 exchange. Then drive to City Park for finishes.","vibe":["Low effort","Most sightings","No MacKenna mid-race"],"stops":[{"time":"6:15 AM","name":"Park \u00b7 Empower Field Lot J","detail":"I-25 N exit 210C / S exit 211. North-side lots."},{"time":"6:45\u20137:00 AM","name":"Kenna baton handoff \u00b7 Exchange 1","detail":"Leg 1 teammate arrives ~6:55. Cheer Kenna out on her leg."},{"time":"6:55\u20137:45 AM","name":"Marathon mile 6 pass","detail":"Vinnie 7:01 \u00b7 Korbin 7:13 \u00b7 Dustin 7:39"},{"time":"8:55\u201311:00 AM","name":"Marathon mile 20 pass","detail":"Vinnie 9:05 \u00b7 Korbin 9:21 \u00b7 Dustin 10:45"},{"time":"9:30\u201310:30 AM","name":"Leg 4 \u2192 leg 5 exchange","detail":"Same spot, different relay teams handing off."},{"time":"10:45 AM","name":"Drive to City Park (35 min)","detail":"I-25 N to Park Ave exit, then east on Park to Monaco."},{"time":"11:45 AM \u2013 12:30 PM","name":"Dustin marathon finish + festival","detail":"Vinnie 9:59 and Korbin 10:17 already in."}],"sightings":["Vinnie passes Empower mile 6 at ~7:01 AM","Korbin passes Empower mile 6 at ~7:13 AM","Kenna runs out from Exchange 1 at ~6:55 AM","Dustin passes Empower mile 6 at ~7:39 AM","Vinnie passes Empower mile 20 at ~9:05 AM","Korbin passes Empower mile 20 at ~9:21 AM","Dustin passes Empower mile 20 at ~10:45 AM","Vinnie finishes City Park ~9:59 AM","Korbin finishes City Park ~10:17 AM","Dustin finishes City Park ~12:07 PM","MacKenna only seen at finish (~9:13 AM, already in by your arrival)"]},"B":{"letter":"B","short":"Stadium Sweep","tag":"Mile 6 then finish","title":"Plan B \u2014 Stadium Sweep","summary":"Empower Field for the early morning only. Catch mile 6 + Kenna handoff, then leave early for MacKenna's finish + all marathon finishes at City Park.","vibe":["Medium effort","All 5 runners","Misses mile 20"],"stops":[{"time":"6:15 AM","name":"Park \u00b7 Empower Field Lot J","detail":"Same as Plan A."},{"time":"6:45\u20137:15 AM","name":"Kenna handoff + marathon mile 6","detail":"Vinnie 7:01 \u00b7 Korbin 7:13 \u00b7 Dustin 7:39 \u00b7 Kenna out ~6:55"},{"time":"7:45 AM","name":"Drive to City Park \u00b7 30 min","detail":"Park east of Colorado Blvd by 8:30."},{"time":"9:02\u20139:26 AM","name":"MacKenna half finish","detail":"Window 9:06\u20139:26. Be at finish by 8:55."},{"time":"9:45\u201310:30 AM","name":"Vinnie & Korbin marathon finish","detail":"Vinnie 9:59 \u00b7 Korbin 10:17."},{"time":"11:45 AM \u2013 12:30 PM","name":"Dustin marathon finish","detail":"Window 11:47 AM \u2013 12:26 PM."}],"sightings":["Kenna runs out from Exchange 1 at ~6:55 AM","Vinnie passes Empower mile 6 at ~7:01 AM","Korbin passes Empower mile 6 at ~7:13 AM","Dustin passes Empower mile 6 at ~7:39 AM","MacKenna finishes City Park ~9:13 AM","Vinnie finishes City Park ~9:59 AM","Korbin finishes City Park ~10:17 AM","Dustin finishes City Park ~12:07 PM"]},"C":{"letter":"C","short":"Three-Hop Chase","tag":"Stadium \u2192 Sloan's \u2192 finish","title":"Plan C \u2014 Three-Hop Chase","summary":"For the ambitious. Catch marathoners three times each: stadium, Sloan's, then finish line. Tight transitions, big payoff.","vibe":["High effort","3x sightings","MacKenna only at finish"],"stops":[{"time":"6:15 AM","name":"Park \u00b7 Empower Field Lot J","detail":"Same drive as Plan A."},{"time":"6:55\u20137:15 AM","name":"Marathon mile 6 + Kenna handoff","detail":"Vinnie 7:01 \u00b7 Korbin 7:13 \u00b7 then leave before Dustin."},{"time":"7:15 AM","name":"Drive to Sloan's \u00b7 15 min","detail":"Via Sheridan from the north. Park north of the lake."},{"time":"7:25\u20138:15 AM","name":"Sloan's \u00b7 Kenna finish + marathon mile 8.5","detail":"Vinnie 7:23 \u00b7 Korbin 7:36 \u00b7 Kenna ~7:31 \u00b7 Dustin 8:13"},{"time":"8:15 AM","name":"Drive to City Park \u00b7 25 min","detail":"Sheridan \u2192 38th \u2192 Monaco."},{"time":"9:02\u20139:26 AM","name":"MacKenna half finish","detail":"Cutting it close. If Dustin runs late at Sloan's, skip ahead to here."},{"time":"9:45 AM \u2013 12:30 PM","name":"All marathon finishes","detail":"Vinnie 9:59 \u00b7 Korbin 10:17 \u00b7 Dustin 11:47 \u2013 12:26."}],"sightings":["Vinnie passes Empower mile 6 at ~7:01 AM","Korbin passes Empower mile 6 at ~7:13 AM","Vinnie passes Sloan's mile 8.5 at ~7:23 AM","Kenna finishes her leg at Sloan's at ~7:31 AM","Korbin passes Sloan's mile 8.5 at ~7:36 AM","Dustin passes Sloan's mile 8.5 at ~8:13 AM","MacKenna finishes City Park ~9:13 AM (tight \u2014 may miss)","Vinnie finishes City Park ~9:59 AM","Korbin finishes City Park ~10:17 AM","Dustin finishes City Park ~12:07 PM"]},"D":{"letter":"D","short":"Downtown Cluster","tag":"Capitol + Firestation","title":"Plan D \u2014 Downtown Cluster","summary":"Capitol and Firestation are both on Colfax, 0.8 mi apart. Marathon runners pass at mile 2.5\u20133.5 around 6:30\u20137:00. MacKenna passes much later at half mile 8 (~8:14). Long dwell, but everyone gets cheered.","vibe":["Long dwell","Marathon early","MacKenna later"],"stops":[{"time":"5:30 AM","name":"Park east of Capitol","detail":"Lot near 16th & Lincoln."},{"time":"6:30\u20136:55 AM","name":"Capitol \u00b7 marathon mile 2.5","detail":"Vinnie ~6:31 \u00b7 Korbin ~6:41 \u00b7 Dustin ~6:53"},{"time":"7:00 AM","name":"Walk 0.8 mi west on Colfax to Firestation","detail":"Stay south of Colfax. Skyline views."},{"time":"7:05\u20137:35 AM","name":"Firestation #1 \u00b7 marathon mile 3.5","detail":"All 3 marathon runners pass. Firefighters cheering."},{"time":"7:35 AM","name":"Cafe break \u00b7 30 min","detail":"Tabor Center area has options. MacKenna in ~35 min."},{"time":"8:12\u20138:27 AM","name":"Back on Colfax \u00b7 MacKenna at half mile 8","detail":"Window 8:10\u20138:22. Capitol or Firestation, half mile apart."},{"time":"8:30 AM","name":"Drive to City Park area","detail":"East on Colfax until past closures."},{"time":"9:02\u20139:26 AM","name":"MacKenna half finish (if you hustle)","detail":"Tight. Alternative: catch her at the festival post-finish."},{"time":"9:45 AM \u2013 12:30 PM","name":"All marathon finishes + festival","detail":"Vinnie 9:59 \u00b7 Korbin 10:17 \u00b7 Dustin 11:47\u201312:26."}],"sightings":["Vinnie passes Capitol mile 2.5 at ~6:31 AM","Korbin passes Capitol mile 2.5 at ~6:41 AM","Dustin passes Capitol mile 2.5 at ~6:53 AM","Same 3 pass Firestation mile 3.5 between 6:35\u20137:00 AM","MacKenna passes Capitol/Firestation half mile 8 at ~8:14 AM","MacKenna finishes City Park ~9:13 AM (tight catch from downtown)","Vinnie finishes City Park ~9:59 AM","Korbin finishes City Park ~10:17 AM","Dustin finishes City Park ~12:07 PM"]},"E":{"letter":"E","short":"Stadium-Confluence","tag":"Same M20 + M22","title":"Plan E \u2014 Stadium-Confluence Walk","summary":"Creative double-dip on late-race miles. After mile 20 sighting at the stadium, walk 0.5 mi east along Cherry Creek Trail to Confluence Park. See marathoners again at mile 22 in their roughest patch.","vibe":["Medium effort","2x late-race","When they need cheering"],"stops":[{"time":"6:15 AM","name":"Park \u00b7 Empower Field Lot J","detail":"Same as Plan A."},{"time":"6:45\u20137:15 AM","name":"Kenna handoff + marathon mile 6","detail":"Vinnie 7:01 \u00b7 Korbin 7:13 \u00b7 Dustin 7:39 \u00b7 Kenna out ~6:55"},{"time":"8:55\u20139:25 AM","name":"Stadium mile 20 \u00b7 Vinnie & Korbin","detail":"Vinnie 9:05 \u00b7 Korbin 9:21. Then walk east."},{"time":"9:25 AM","name":"Walk 0.5 mi east on Cherry Creek Trail","detail":"Past Confluence Park toward the river/kayakers."},{"time":"9:30\u201310:00 AM","name":"Confluence \u00b7 mile ~22 \u00b7 Vinnie & Korbin again","detail":"Same runners, second wind needed. Cheer hard."},{"time":"10:30 AM","name":"Walk back, wait for Dustin at stadium mile 20","detail":"Dustin window 10:30\u201311:00."},{"time":"11:00 AM","name":"Optional \u00b7 Dustin at Confluence mile 22","detail":"Walk east one more time if you have legs."},{"time":"11:30 AM","name":"Drive to City Park (35 min)","detail":"Or rideshare."},{"time":"11:45 AM \u2013 12:30 PM","name":"Dustin finish + festival","detail":"Reunion at the beer garden."}],"sightings":["Kenna runs out from Exchange 1 at ~6:55 AM","Vinnie passes Empower mile 6 at ~7:01 AM","Korbin passes Empower mile 6 at ~7:13 AM","Dustin passes Empower mile 6 at ~7:39 AM","Vinnie passes Empower mile 20 at ~9:05 AM","Korbin passes Empower mile 20 at ~9:21 AM","Vinnie passes Confluence mile 22 at ~9:34 AM","Korbin passes Confluence mile 22 at ~9:51 AM","Dustin passes Empower mile 20 at ~10:45 AM","Dustin passes Confluence mile 22 at ~11:11 AM (if you walk back)","Dustin finishes City Park ~12:07 PM"]},"F":{"letter":"F","short":"Sloan's Lock-In","tag":"Sloan's + finish","title":"Plan F \u2014 Sloan's Lake Lock-In","summary":"Alternative single-spot anchor. Catches all 3 marathoners AND Kenna's finish at the same place. Less chaos than Empower Field, dragon boats are fun.","vibe":["Low effort","4 runners one spot","Skips stadium"],"stops":[{"time":"6:30 AM","name":"Park north of Sloan's","detail":"Down Sheridan from the north. Park on Tennyson or 17th north of the lake."},{"time":"6:50 AM","name":"Walk to 17th & Vrain (Exchange 2)","detail":"South side of Sloan's park."},{"time":"7:15\u20138:15 AM","name":"Marathon mile 8.5 + Kenna leg finish","detail":"Vinnie 7:23 \u00b7 Korbin 7:36 \u00b7 Kenna ~7:31 \u00b7 Dustin 8:13"},{"time":"8:30 AM","name":"Drive to City Park \u00b7 25 min","detail":"Plan around closures."},{"time":"9:02\u20139:26 AM","name":"MacKenna half finish","detail":"Set up at finish by 8:55."},{"time":"9:45 AM \u2013 12:30 PM","name":"All marathon finishes","detail":"Vinnie 9:59 \u00b7 Korbin 10:17 \u00b7 Dustin 11:47\u201312:26."}],"sightings":["Vinnie passes Sloan's mile 8.5 at ~7:23 AM","Korbin passes Sloan's mile 8.5 at ~7:36 AM","Kenna finishes her leg at Sloan's at ~7:31 AM","Dustin passes Sloan's mile 8.5 at ~8:13 AM","MacKenna finishes City Park ~9:13 AM","Vinnie finishes City Park ~9:59 AM","Korbin finishes City Park ~10:17 AM","Dustin finishes City Park ~12:07 PM"]},"G":{"letter":"G","short":"Late-Game","tag":"Sleep in \u00b7 17th Ave + finish","title":"Plan G \u2014 Late-Game","summary":"For watchers who can't do 5 AM. Sleep in. Show up at 8 AM. Catch MacKenna at 17th Ave, her finish, then all marathon finishes.","vibe":["Sleep in","Most walking","Misses Kenna"],"stops":[{"time":"7:45 AM","name":"Park near 17th Ave east of City Park","detail":"Street parking on 19th or 20th, east of York."},{"time":"8:47\u20139:07 AM","name":"17th Ave at Williams \u00b7 MacKenna H11\u201312","detail":"Window 8:49\u20139:00. Stay NORTH of 17th."},{"time":"9:07 AM","name":"Walk back toward City Park finish (10 min)","detail":"Cross at 17th & Race or 17th & Cook."},{"time":"9:13 AM","name":"MacKenna finish \u00b7 City Park","detail":"Window 9:06\u20139:26."},{"time":"9:30\u201310:00 AM","name":"17th Ave again \u00b7 early marathon runners","detail":"Vinnie at mile 24 ~9:40 \u00b7 Korbin ~9:58."},{"time":"10:00 AM","name":"Back to finish line","detail":"Set up at festival."},{"time":"10:00 AM \u2013 12:30 PM","name":"All marathon finishes","detail":"Vinnie 9:59 \u00b7 Korbin 10:17 \u00b7 Dustin 11:47\u201312:26."}],"sightings":["MacKenna passes 17th Ave mile 11-12 at ~8:49\u20139:00 AM","MacKenna finishes City Park ~9:13 AM","Vinnie passes 17th Ave mile 24 at ~9:40 AM","Korbin passes 17th Ave mile 24 at ~9:58 AM","Vinnie finishes City Park ~9:59 AM","Korbin finishes City Park ~10:17 AM","Dustin finishes City Park ~12:07 PM","Kenna not seen \u2014 she's done by ~7:31 AM"]},"H":{"letter":"H","short":"Downtown Bookend","tag":"Capitol + Mall + finish","title":"Plan H \u2014 Downtown Bookend","summary":"Park downtown 5:45 AM. Capitol at marathon mile 2.5 for all 3 marathoners. Cafe break. MacKenna passes Capitol at half mile 8 (~8:14). Then 16th Street Mall for marathon mile 23. Walk/drive to City Park.","vibe":["Leisurely","Coffee included","Downtown morning"],"stops":[{"time":"5:45 AM","name":"Park downtown \u00b7 16th & Lincoln area","detail":"Central lots accessible."},{"time":"6:30\u20136:55 AM","name":"Capitol \u00b7 marathon mile 2.5","detail":"Vinnie 6:31 \u00b7 Korbin 6:41 \u00b7 Dustin 6:53"},{"time":"7:00 AM","name":"Cafe break \u00b7 Tabor Center or Larimer Square","detail":"About an hour until MacKenna."},{"time":"8:07\u20138:27 AM","name":"Back to Capitol or Firestation \u00b7 MacKenna H8","detail":"Window 8:10\u20138:22."},{"time":"8:30 AM","name":"Walk to 16th Street Mall \u00b7 stay there","detail":"Tabor Center area. Marathon at M23 starts ~9:30."},{"time":"9:30\u201310:15 AM","name":"16th Mall \u00b7 M23 \u00b7 Vinnie & Korbin","detail":"Indoor restrooms, food."},{"time":"10:30 AM","name":"Drive or walk to City Park \u00b7 20 min","detail":"Closures lifting along outer routes."},{"time":"11:00 AM","name":"At City Park festival","detail":"MacKenna, Vinnie, Korbin already in."},{"time":"11:45 AM \u2013 12:30 PM","name":"Dustin marathon finish","detail":"Window 11:47\u201312:26."}],"sightings":["Vinnie passes Capitol mile 2.5 at ~6:31 AM","Korbin passes Capitol mile 2.5 at ~6:41 AM","Dustin passes Capitol mile 2.5 at ~6:53 AM","MacKenna passes Capitol/Firestation half mile 8 at ~8:14 AM","Vinnie passes 16th Mall mile 23 at ~9:33 AM","Korbin passes 16th Mall mile 23 at ~9:50 AM","MacKenna finishes City Park ~9:13 AM (already done by 16th Mall stop)","Vinnie finishes City Park ~9:59 AM","Korbin finishes City Park ~10:17 AM","Dustin finishes City Park ~12:07 PM"]}};
 
 const RACERS = {
-  dustin:    { name:'Dustin',    race:'marathon', startGun:360, startOffset:20, paceTarget:13.25, paceFast:12.5, paceSlow:14.0, dist:26.2, color:'#e63946' },
+  dustin:    { name:'Dustin',    race:'marathon', startGun:360, startOffset:20, paceTarget:13.25, paceFast:12.83, paceSlow:13.33, dist:26.2, color:'#e63946' },
   korbin:    { name:'Korbin',    race:'marathon', startGun:360, startOffset:18, paceTarget:9.15, paceFast:8.0,  paceSlow:9.5,  dist:26.2, color:'#f0b418' },
   vinnie:    { name:'Vinnie',    race:'marathon', startGun:360, startOffset:8,  paceTarget:8.83, paceFast:8.5,  paceSlow:11.5, dist:26.2, color:'#4ade80' },
   mackenna:  { name:'MacKenna',  race:'half',     startGun:390, startOffset:12, paceTarget:11.5, paceFast:11.0, paceSlow:12.5, dist:13.1, color:'#2a9d8f' },
   kenna:     { name:'Kenna',     race:'relay',    startGun:360, startOffset:55, paceTarget:9.5,  paceFast:9.0,  paceSlow:10.5, dist:3.8,  color:'#9d4edd' }
 };
+
+// Populate static "Est. finish" line on each runner card
+Object.keys(RACERS).forEach(key => {
+  const el = document.getElementById('finish-' + key);
+  if (!el) return;
+  const r = RACERS[key];
+  const label = r.race === 'relay' ? 'Leg finish' : 'Est. finish';
+  el.textContent = label + ': ' + finishWindow(r);
+});
 
 // Tab switching
 document.querySelectorAll('.tab').forEach(t => {
@@ -512,6 +527,25 @@ function fmtTimeShort(mins) {
   const m = Math.round(mins) % 60;
   const h12 = h > 12 ? h - 12 : (h === 0 ? 12 : h);
   return h12 + ':' + String(m).padStart(2, '0');
+}
+// Compute finish window from paceFast (best case) to paceSlow (worst case)
+// Returns formatted string like "11:57-12:09 PM" with single AM/PM suffix when same period
+function finishWindow(racer) {
+  const fastMin = racer.startGun + racer.startOffset + racer.dist * racer.paceFast;
+  const slowMin = racer.startGun + racer.startOffset + racer.dist * racer.paceSlow;
+  const fastH = Math.floor(fastMin / 60) % 24;
+  const slowH = Math.floor(slowMin / 60) % 24;
+  const fastAM = fastH < 12;
+  const slowAM = slowH < 12;
+  const fastStr = fmtTimeShort(fastMin);
+  const slowStr = fmtTimeShort(slowMin);
+  const fastSuffix = fastAM ? 'AM' : 'PM';
+  const slowSuffix = slowAM ? 'AM' : 'PM';
+  // If both in same period, show suffix once at end
+  if (fastSuffix === slowSuffix) {
+    return fastStr + '-' + slowStr + ' ' + slowSuffix;
+  }
+  return fastStr + ' ' + fastSuffix + '-' + slowStr + ' ' + slowSuffix;
 }
 
 // Where is this racer at this moment? Returns {status, mile, lat, lng, label}
@@ -647,9 +681,8 @@ function buildRunnerPopup(key, racer, where, nowMin) {
     html += '<div class="pop-stat"><span class="pop-stat-label">ETA</span><span class="pop-stat-value">' + fmtTimeShort(next.eta) + ' (' + Math.round(next.eta - nowMin) + ' min)</span></div>';
   }
 
-  // Finish ETA
-  const finishMin = racer.startGun + racer.startOffset + racer.dist * racer.paceTarget;
-  html += '<div class="pop-stat"><span class="pop-stat-label">Est. finish</span><span class="pop-stat-value">' + fmtTimeShort(finishMin) + '</span></div>';
+  // Finish window (best-case to worst-case from paceFast/paceSlow)
+  html += '<div class="pop-stat"><span class="pop-stat-label">Est. finish</span><span class="pop-stat-value">' + finishWindow(racer) + '</span></div>';
   return html;
 }
 
