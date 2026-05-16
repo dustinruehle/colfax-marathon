@@ -66,14 +66,19 @@
   .clock-time { font-family: var(--font-display); font-size: 32px; line-height: 1.1; margin-top: 4px; font-variant-numeric: tabular-nums; font-weight: 400; }
   .clock-sub { font-size: 12px; color: var(--text-2); margin-top: 2px; }
   .sim-controls { display: flex; gap: 8px; align-items: center; margin-top: 12px; flex-wrap: wrap; }
-  .sim-controls input[type="time"] { background: var(--surface-2); border: 1px solid var(--border-strong); color: var(--text); padding: 6px 10px; border-radius: 8px; font-size: 13px; font-family: var(--font-mono); height: 32px; }
-  .sim-controls button { background: transparent; border: 1px solid var(--border-strong); color: var(--text); padding: 6px 12px; border-radius: 8px; font-size: 12px; height: 32px; cursor: pointer; font-family: var(--font-body); }
+  .sim-controls input[type="time"] { background: var(--surface-2); border: 1.5px solid var(--accent); color: var(--text); padding: 8px 12px; border-radius: 8px; font-size: 15px; font-family: var(--font-mono); font-weight: 600; height: 38px; min-width: 110px; cursor: pointer; }
+  .sim-controls input[type="time"]:focus { outline: none; border-color: var(--accent); background: var(--accent-fade); }
+  .sim-controls button { background: transparent; border: 1px solid var(--border-strong); color: var(--text); padding: 8px 14px; border-radius: 8px; font-size: 13px; height: 38px; cursor: pointer; font-family: var(--font-body); font-weight: 600; }
   .sim-controls button:active { background: var(--surface-2); }
   .sim-controls button.btn-sim { color: var(--accent); border-color: var(--accent); }
   .sim-controls button.btn-sim:active { background: var(--accent-fade); }
   .sim-controls button.btn-live-active { background: rgba(74, 222, 128, 0.12); color: #4ade80; border-color: #4ade80; }
-  .sim-hint { font-size: 11px; color: var(--text-3); margin-top: 8px; line-height: 1.4; }
-  .sim-hint .pill { display: inline-block; background: var(--surface-2); padding: 1px 6px; border-radius: 4px; font-family: var(--font-mono); font-size: 10px; color: var(--text-2); }
+  .sim-hint { font-size: 12px; color: var(--text-3); margin-top: 10px; line-height: 1.5; display: flex; flex-direction: column; gap: 4px; }
+  .sim-hint-row { display: flex; align-items: baseline; gap: 8px; white-space: normal; }
+  .sim-hint-row .pill { display: inline-block; background: var(--surface-2); padding: 2px 8px; border-radius: 4px; font-family: var(--font-mono); font-size: 11px; color: var(--text-2); font-weight: 600; flex-shrink: 0; white-space: nowrap; }
+  .sim-hint-row .pill.active-live { background: rgba(74, 222, 128, 0.15); color: #4ade80; }
+  .sim-hint-row .pill.active-sim { background: var(--accent-fade); color: var(--accent); }
+  .sim-hint-row span:last-child { flex: 1; }
   @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
   .live-indicator { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--success); animation: pulse 2s infinite; margin-right: 6px; vertical-align: 2px; }
   .live-indicator.sim { background: var(--accent); animation: none; }
@@ -319,7 +324,8 @@
     <button class="btn-live-active" id="btnLive" onclick="clearSim()">Live</button>
   </div>
   <div class="sim-hint" id="simHint">
-    <span class="pill">Live</span> shows the actual race right now &middot; pick a time and tap <span class="pill">Simulate</span> to preview the map later
+    <div class="sim-hint-row"><span class="pill active-live">Live</span><span>Real race, right now (default)</span></div>
+    <div class="sim-hint-row"><span class="pill">Simulate</span><span>Pick a time above, then tap Simulate to preview the map at that moment</span></div>
   </div>
 </div>
 
@@ -395,7 +401,7 @@
     <div class="runner-init r-kenna">K</div>
     <div class="runner-body">
       <div class="runner-name">Kenna · relay leg 2</div>
-      <div class="runner-meta">Bib 92589258 · 3.8 mi · 9:30 pace · stadium &rarr; Sloan&apos;s</div>
+      <div class="runner-meta">Bib 9258 · 3.8 mi · 9:30 pace · stadium &rarr; Sloan&apos;s</div>
       <div class="runner-finish" id="finish-kenna">Est. finish: —</div>
     </div>
   </div>
@@ -507,7 +513,7 @@
     <div class="bib-row"><span>Korbin</span><span>13962</span></div>
     <div class="bib-row"><span>Vinnie</span><span>13020</span></div>
     <div class="bib-row"><span>MacKenna</span><span>7011</span></div>
-    <div class="bib-row"><span>Kenna</span><span>92589258</span></div>
+    <div class="bib-row"><span>Kenna</span><span>9258</span></div>
   </div>
 
   <div class="callout">
@@ -844,12 +850,15 @@ function setSim() {
     document.getElementById('btnLive').classList.add('btn-sim');
     // Update hint
     const hint = document.getElementById('simHint');
-    if (hint) hint.innerHTML = 'You\u2019re previewing a simulated time \u00b7 tap <span class="pill">Live</span> to return to the actual race clock';
+    if (hint) hint.innerHTML =
+      '<div class="sim-hint-row"><span class="pill active-sim">Simulate</span><span>You\u2019re previewing a simulated time</span></div>' +
+      '<div class="sim-hint-row"><span class="pill">Live</span><span>Tap Live to return to the actual race clock</span></div>';
     updateAll();
   } else {
     // No time entered yet
     const hint = document.getElementById('simHint');
-    if (hint) hint.innerHTML = '<span style="color: var(--accent);">Pick a time in the field first</span>, then tap Simulate';
+    if (hint) hint.innerHTML =
+      '<div class="sim-hint-row"><span class="pill" style="background: var(--accent-fade); color: var(--accent);">Pick a time first</span><span>Tap the time field above, set a time, then tap Simulate</span></div>';
   }
 }
 function clearSim() {
@@ -864,7 +873,9 @@ function clearSim() {
   document.getElementById('btnSim').classList.add('btn-sim');
   // Restore default hint
   const hint = document.getElementById('simHint');
-  if (hint) hint.innerHTML = '<span class="pill">Live</span> shows the actual race right now \u00b7 pick a time and tap <span class="pill">Simulate</span> to preview the map later';
+  if (hint) hint.innerHTML =
+    '<div class="sim-hint-row"><span class="pill active-live">Live</span><span>Real race, right now (default)</span></div>' +
+    '<div class="sim-hint-row"><span class="pill">Simulate</span><span>Pick a time above, then tap Simulate to preview the map at that moment</span></div>';
   updateAll();
 }
 function fmtTime(mins) {
