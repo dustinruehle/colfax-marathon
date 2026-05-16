@@ -40,6 +40,25 @@
   .topbar { display: flex; align-items: baseline; justify-content: space-between; padding: 20px 0 16px; border-bottom: 1px solid var(--border); }
   .topbar-title { font-family: var(--font-display); font-size: 22px; font-weight: 400; letter-spacing: -0.01em; line-height: 1; }
   .topbar-date { font-size: 11px; color: var(--text-3); letter-spacing: 0.08em; text-transform: uppercase; }
+  .topbar-right { display: flex; align-items: center; gap: 12px; }
+  .help-btn { width: 28px; height: 28px; border-radius: 50%; background: transparent; border: 1.5px solid var(--text-3); color: var(--text-2); font-size: 14px; font-weight: 700; font-family: var(--font-display); cursor: pointer; padding: 0; line-height: 1; transition: all 0.15s; display: flex; align-items: center; justify-content: center; }
+  .help-btn:active { background: var(--accent-fade); border-color: var(--accent); color: var(--accent); }
+  .help-overlay { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: flex-end; justify-content: center; }
+  .help-backdrop { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); }
+  .help-panel { position: relative; background: var(--surface); border-top-left-radius: 16px; border-top-right-radius: 16px; max-width: 480px; width: 100%; max-height: 80vh; overflow-y: auto; box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.5); border-top: 1px solid var(--border-strong); }
+  .help-header { display: flex; justify-content: space-between; align-items: center; padding: 18px 20px 12px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--surface); }
+  .help-title { font-family: var(--font-display); font-size: 18px; font-weight: 400; color: var(--accent); }
+  .help-close { background: transparent; border: none; color: var(--text-2); font-size: 28px; font-weight: 300; cursor: pointer; padding: 0 4px; line-height: 1; font-family: inherit; }
+  .help-close:active { color: var(--text); }
+  .help-body { padding: 16px 20px 24px; font-size: 14px; line-height: 1.55; color: var(--text); }
+  .help-body strong { color: var(--accent); font-weight: 600; }
+  .help-body p { margin: 0 0 12px; }
+  .help-body p:last-child { margin-bottom: 0; }
+  .help-body ul { margin: 0 0 12px; padding-left: 20px; }
+  .help-body li { margin-bottom: 6px; }
+  .help-body .help-section { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--border); }
+  .help-body .help-section:first-child { margin-top: 0; padding-top: 0; border-top: none; }
+  .help-body .help-section-title { font-size: 11px; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; font-weight: 600; }
 
   .clock { background: var(--surface); border-radius: var(--radius-lg); padding: 16px 18px; margin: 16px 0; position: relative; overflow: hidden; }
   .clock::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--accent); }
@@ -268,7 +287,21 @@
 
 <div class="topbar">
   <div class="topbar-title">Colfax Live</div>
-  <div class="topbar-date">Sun · May 17</div>
+  <div class="topbar-right">
+    <div class="topbar-date">Sun · May 17</div>
+    <button class="help-btn" id="helpBtn" aria-label="Help">?</button>
+  </div>
+</div>
+
+<div id="helpOverlay" class="help-overlay" style="display: none;">
+  <div class="help-backdrop" id="helpBackdrop"></div>
+  <div class="help-panel">
+    <div class="help-header">
+      <div class="help-title" id="helpTitle">Help</div>
+      <button class="help-close" id="helpClose" aria-label="Close">&times;</button>
+    </div>
+    <div class="help-body" id="helpBody"></div>
+  </div>
 </div>
 
 <div class="clock">
@@ -513,6 +546,130 @@ Object.keys(RACERS).forEach(key => {
   const r = RACERS[key];
   const label = r.race === 'relay' ? 'Leg finish' : 'Est. finish';
   el.textContent = label + ': ' + finishWindow(r);
+});
+
+// Help content per tab — shown when the ? button is tapped
+const HELP_CONTENT = {
+  map: {
+    title: 'Map',
+    body:
+      '<div class="help-section">' +
+      '<p>Live map of the race. Runner pins move automatically as the race unfolds.</p>' +
+      '</div>' +
+      '<div class="help-section">' +
+      '<div class="help-section-title">Filter chips (top)</div>' +
+      '<ul>' +
+      '<li><strong>Marathon route</strong> &middot; toggle the 26.2 mi course (red)</li>' +
+      '<li><strong>Half route</strong> &middot; toggle the 13.1 mi course (teal dashed)</li>' +
+      '<li><strong>Live runners</strong> &middot; toggle runner pins</li>' +
+      '</ul>' +
+      '</div>' +
+      '<div class="help-section">' +
+      '<div class="help-section-title">On the map</div>' +
+      '<ul>' +
+      '<li><strong>Blue circles</strong> are spectator spots &mdash; tap for details</li>' +
+      '<li><strong>Colored triangles</strong> are live runners &mdash; tap for current mile, next spot ETA, and finish window</li>' +
+      '<li>Pinch to zoom, drag to pan</li>' +
+      '</ul>' +
+      '</div>' +
+      '<div class="help-section">' +
+      '<div class="help-section-title">Time simulator</div>' +
+      '<p>Use the clock controls above to preview what the map will look like at any time. Tap <strong>Live</strong> to return to the current race clock.</p>' +
+      '</div>'
+  },
+  runners: {
+    title: 'Runners',
+    body:
+      '<div class="help-section">' +
+      '<p>The 5 people we&apos;re tracking today &mdash; 3 marathoners, 1 half marathoner, 1 relay leg.</p>' +
+      '</div>' +
+      '<div class="help-section">' +
+      '<div class="help-section-title">What each card shows</div>' +
+      '<ul>' +
+      '<li><strong>Bib &amp; corral</strong> &middot; for chip tracking on runcolfax.org</li>' +
+      '<li><strong>Pace target</strong> &middot; minutes per mile they&apos;re aiming for</li>' +
+      '<li><strong>Est. finish window</strong> &middot; the time range you should expect them to cross the line (best case to worst case based on pace assumptions)</li>' +
+      '</ul>' +
+      '</div>' +
+      '<div class="help-section">' +
+      '<div class="help-section-title">Where they are now</div>' +
+      '<p>The list below the cards updates with each runner&apos;s current estimated position on the course.</p>' +
+      '</div>'
+  },
+  plans: {
+    title: 'Plans',
+    body:
+      '<div class="help-section">' +
+      '<p>8 pre-built spectator routes for the day. Each one ends at City Park for the finishes. Pick what matches your energy and how many runners you want to see in person.</p>' +
+      '</div>' +
+      '<div class="help-section">' +
+      '<div class="help-section-title">How to use</div>' +
+      '<ul>' +
+      '<li>Tap a plan letter (A-H) to see its full itinerary</li>' +
+      '<li>Read <strong>Who you&apos;ll see</strong> for the runner sightings</li>' +
+      '<li>Tap <strong>View all stops on map</strong> to see the plan&apos;s spots highlighted on the map &mdash; with a Back button to return here</li>' +
+      '</ul>' +
+      '</div>' +
+      '<div class="help-section">' +
+      '<div class="help-section-title">Reading the chips</div>' +
+      '<p>Effort level, key feature, and tradeoff. A plan tagged <strong>Low effort</strong> + <strong>Most sightings</strong> + <strong>No MacKenna mid-race</strong> means easy day, lots of cheering, you&apos;ll only see MacKenna at the finish.</p>' +
+      '</div>'
+  },
+  spots: {
+    title: 'Spots',
+    body:
+      '<div class="help-section">' +
+      '<p>Every viewing location with parking notes, watching tips, and when each runner passes through.</p>' +
+      '</div>' +
+      '<div class="help-section">' +
+      '<div class="help-section-title">What each card shows</div>' +
+      '<ul>' +
+      '<li><strong>Time window</strong> &middot; when runners pass through this spot</li>' +
+      '<li><strong>Mile markers</strong> &middot; which course mile (marathon and/or half)</li>' +
+      '<li><strong>Drive/Walk/Watch</strong> &middot; how to get there and where to stand</li>' +
+      '</ul>' +
+      '</div>' +
+      '<div class="help-section">' +
+      '<div class="help-section-title">Show on map</div>' +
+      '<p>The button at the bottom of each card jumps to the Map tab and zooms in on that spot. Tap a different tab to come back.</p>' +
+      '</div>'
+  },
+  info: {
+    title: 'Info',
+    body:
+      '<div class="help-section">' +
+      '<p>Reference info you need on race day &mdash; not how to use the app, but the actual facts.</p>' +
+      '</div>' +
+      '<div class="help-section">' +
+      '<div class="help-section-title">What&apos;s here</div>' +
+      '<ul>' +
+      '<li><strong>Live tracking</strong> &middot; links to official chip-tracking and the RaceJoy GPS app</li>' +
+      '<li><strong>Bib numbers</strong> &middot; copy-paste into runcolfax.org/race-results to look up splits</li>' +
+      '<li><strong>Road closures</strong> &middot; what to avoid 5 AM &ndash; 1 PM</li>' +
+      '<li><strong>Race start times</strong> &middot; marathon 6:00 AM, half 6:30 AM</li>' +
+      '</ul>' +
+      '</div>'
+  }
+};
+function openHelp() {
+  // Find active tab and load its content
+  const activeTab = document.querySelector('.tab.active');
+  const tabKey = activeTab ? activeTab.dataset.tab : 'map';
+  const content = HELP_CONTENT[tabKey] || HELP_CONTENT.map;
+  document.getElementById('helpTitle').textContent = content.title;
+  document.getElementById('helpBody').innerHTML = content.body;
+  document.getElementById('helpOverlay').style.display = 'flex';
+}
+function closeHelp() {
+  document.getElementById('helpOverlay').style.display = 'none';
+}
+document.getElementById('helpBtn').addEventListener('click', openHelp);
+document.getElementById('helpClose').addEventListener('click', closeHelp);
+document.getElementById('helpBackdrop').addEventListener('click', closeHelp);
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && document.getElementById('helpOverlay').style.display === 'flex') {
+    closeHelp();
+  }
 });
 
 // Tab switching
