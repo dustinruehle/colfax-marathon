@@ -66,8 +66,14 @@
   .clock-time { font-family: var(--font-display); font-size: 32px; line-height: 1.1; margin-top: 4px; font-variant-numeric: tabular-nums; font-weight: 400; }
   .clock-sub { font-size: 12px; color: var(--text-2); margin-top: 2px; }
   .sim-controls { display: flex; gap: 8px; align-items: center; margin-top: 12px; flex-wrap: wrap; }
-  .sim-controls input[type="time"] { background: var(--surface-2); border: 1.5px solid var(--accent); color: var(--text); padding: 8px 12px; border-radius: 8px; font-size: 15px; font-family: var(--font-mono); font-weight: 600; height: 38px; min-width: 110px; cursor: pointer; }
+  .sim-time-wrap { position: relative; display: inline-block; }
+  .sim-controls input[type="time"] { background: var(--surface-2); border: 1.5px solid var(--accent); color: var(--text); padding: 8px 12px; border-radius: 8px; font-size: 15px; font-family: var(--font-mono); font-weight: 600; height: 38px; min-width: 110px; cursor: pointer; position: relative; z-index: 1; }
   .sim-controls input[type="time"]:focus { outline: none; border-color: var(--accent); background: var(--accent-fade); }
+  /* Placeholder hint overlay — shown when input is empty, hidden when has-value class is added */
+  .sim-time-placeholder { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 6px; color: var(--text-3); font-size: 13px; font-family: var(--font-body); pointer-events: none; z-index: 2; transition: opacity 0.15s; }
+  .sim-time-wrap.has-value .sim-time-placeholder { opacity: 0; }
+  .sim-time-placeholder .placeholder-arrow { font-size: 14px; color: var(--accent); }
+  .sim-time-placeholder .placeholder-text { color: var(--accent); font-weight: 600; font-size: 12px; letter-spacing: 0.02em; }
   .sim-controls button { background: transparent; border: 1px solid var(--border-strong); color: var(--text); padding: 8px 14px; border-radius: 8px; font-size: 13px; height: 38px; cursor: pointer; font-family: var(--font-body); font-weight: 600; }
   .sim-controls button:active { background: var(--surface-2); }
   .sim-controls button.btn-sim { color: var(--accent); border-color: var(--accent); }
@@ -319,13 +325,18 @@
   <div class="clock-time" id="clockTime">--:--</div>
   <div class="clock-sub" id="clockSub">Live runner tracking on real map</div>
   <div class="sim-controls">
-    <input type="time" id="simInput" />
+    <label class="sim-time-wrap" id="simTimeWrap">
+      <input type="time" id="simInput" />
+      <span class="sim-time-placeholder" aria-hidden="true">
+        <span class="placeholder-text">Tap to set time</span>
+      </span>
+    </label>
     <button class="btn-sim" id="btnSim" onclick="setSim()">Simulate</button>
     <button class="btn-live-active" id="btnLive" onclick="clearSim()">Live</button>
   </div>
   <div class="sim-hint" id="simHint">
     <div class="sim-hint-row"><span class="pill active-live">Live</span><span>Real race, right now (default)</span></div>
-    <div class="sim-hint-row"><span class="pill">Simulate</span><span>Pick a time above, then tap Simulate to preview the map at that moment</span></div>
+    <div class="sim-hint-row"><span class="pill">Simulate</span><span>Tap the amber box, set a time, then tap Simulate</span></div>
   </div>
 </div>
 
@@ -588,12 +599,12 @@ const HELP_CONTENT = {
       '</div>' +
       '<div class="help-section">' +
       '<div class="help-section-title">Live vs Simulate (top of page)</div>' +
-      '<p>The clock at the top of the app has two buttons next to a time picker.</p>' +
+      '<p>The clock at the top of the app has two buttons next to an amber time box.</p>' +
       '<ul>' +
       '<li><strong>Live</strong> &middot; the default. Shows where runners actually are <em>right now</em>. Green-highlighted when active.</li>' +
-      '<li><strong>Simulate</strong> &middot; preview what the map will look like at any time. Pick a time in the field (e.g. 9:15 AM), tap Simulate, and the whole app jumps to that moment. The Live indicator turns amber as a warning that you\u2019re NOT viewing real time.</li>' +
+      '<li><strong>Simulate</strong> &middot; preview what the map will look like at any time. <strong>Tap the amber box</strong> labeled "Tap to set time", set a time (e.g. 9:15 AM), then tap Simulate. The whole app jumps to that moment.</li>' +
       '</ul>' +
-      '<p>Tap <strong>Live</strong> anytime to return to the actual race clock.</p>' +
+      '<p>The Live indicator turns amber as a warning that you\u2019re NOT viewing real time. Tap <strong>Live</strong> anytime to return to the actual race clock.</p>' +
       '</div>'
   },
   runners: {
@@ -836,6 +847,11 @@ function getNowMin() {
   const d = new Date();
   return d.getHours() * 60 + d.getMinutes();
 }
+// Toggle "Tap to set time" placeholder visibility based on input value
+document.getElementById('simInput').addEventListener('input', (e) => {
+  const wrap = document.getElementById('simTimeWrap');
+  if (wrap) wrap.classList.toggle('has-value', !!e.target.value);
+});
 function setSim() {
   const v = document.getElementById('simInput').value;
   if (v) {
@@ -843,6 +859,8 @@ function setSim() {
     simTime = parseInt(p[0]) * 60 + parseInt(p[1]);
     document.getElementById('liveDot').classList.add('sim');
     document.getElementById('liveLabel').textContent = 'Simulated time';
+    // Make sure placeholder is hidden
+    document.getElementById('simTimeWrap').classList.add('has-value');
     // Swap active styling: now Simulate is the active state, Live becomes the way back
     document.getElementById('btnSim').classList.add('btn-live-active');
     document.getElementById('btnSim').classList.remove('btn-sim');
@@ -858,12 +876,13 @@ function setSim() {
     // No time entered yet
     const hint = document.getElementById('simHint');
     if (hint) hint.innerHTML =
-      '<div class="sim-hint-row"><span class="pill" style="background: var(--accent-fade); color: var(--accent);">Pick a time first</span><span>Tap the time field above, set a time, then tap Simulate</span></div>';
+      '<div class="sim-hint-row"><span class="pill" style="background: var(--accent-fade); color: var(--accent);">Pick a time first</span><span>Tap the amber time box above, set a time, then tap Simulate</span></div>';
   }
 }
 function clearSim() {
   simTime = null;
   document.getElementById('simInput').value = '';
+  document.getElementById('simTimeWrap').classList.remove('has-value');
   document.getElementById('liveDot').classList.remove('sim');
   document.getElementById('liveLabel').textContent = 'Live race clock';
   // Restore default active styling: Live is the live state
@@ -875,7 +894,7 @@ function clearSim() {
   const hint = document.getElementById('simHint');
   if (hint) hint.innerHTML =
     '<div class="sim-hint-row"><span class="pill active-live">Live</span><span>Real race, right now (default)</span></div>' +
-    '<div class="sim-hint-row"><span class="pill">Simulate</span><span>Pick a time above, then tap Simulate to preview the map at that moment</span></div>';
+    '<div class="sim-hint-row"><span class="pill">Simulate</span><span>Tap the amber box, set a time, then tap Simulate</span></div>';
   updateAll();
 }
 function fmtTime(mins) {
