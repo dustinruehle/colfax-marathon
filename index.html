@@ -894,11 +894,7 @@ function getNowMin() {
       if (liveDot) liveDot.classList.add('sim');
       const liveLabel = document.getElementById('liveLabel');
       if (liveLabel) liveLabel.textContent = 'Simulated time';
-      const btnLive = document.getElementById('btnLive');
-      if (btnLive) {
-        btnLive.classList.remove('btn-live-active');
-        btnLive.classList.add('btn-sim');
-      }
+      // Live stays green — it's the consistent anchor back to reality
       const hint = document.getElementById('simHint');
       if (hint) hint.innerHTML =
         '<div class="sim-hint-row"><span class="pill active-sim">Simulating</span><span>Previewing the map at your picked time \u00b7 tap <strong>Live</strong> to return</span></div>';
